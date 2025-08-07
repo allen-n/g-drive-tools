@@ -1,0 +1,13 @@
+{
+  "name": "drive-quick-link",
+  "version": "0.1.0",
+  "description": "Chrome extension to copy Google Drive item links in one click",
+  "main": "content.js",
+  "scripts": {
+    "build": "zip -r drive-quick-link.zip manifest.json content.js icons/ README.md",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": ["chrome-extension", "google-drive", "clipboard"],
+  "author": "Allen",
+  "license": "MIT"
+}
