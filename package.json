@@ -1,13 +1,23 @@
 {
-  "name": "drive-quick-link",
+  "name": "g-drive-tools",
+  "description": "Small Google Workspace enhancements, starting with opening a document's parent folder.",
+  "private": true,
   "version": "0.1.0",
-  "description": "Chrome extension to copy Google Drive item links in one click",
-  "main": "content.js",
+  "type": "module",
+  "packageManager": "pnpm@10.12.3",
+  "engines": { "node": ">=22.12.0" },
   "scripts": {
-    "build": "zip -r drive-quick-link.zip manifest.json content.js icons/ README.md",
-    "test": "echo \"No tests specified\" && exit 0"
+    "dev": "wxt",
+    "build": "wxt build",
+    "zip": "wxt zip",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "postinstall": "wxt prepare"
   },
-  "keywords": ["chrome-extension", "google-drive", "clipboard"],
-  "author": "Allen",
-  "license": "MIT"
+  "devDependencies": {
+    "wxt": "^0.21.4",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.0",
+    "happy-dom": "^20.0.0"
+  }
 }
