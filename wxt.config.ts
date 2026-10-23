@@ -7,7 +7,15 @@ export default defineConfig({
     permissions: ['activeTab', 'scripting'],
     // Drive hosts the cross-origin folder picker embedded by Docs/Sheets/Slides.
     host_permissions: ['https://drive.google.com/*'],
-    action: { default_title: 'Open parent folder' },
+    action: {
+      default_title: 'Open parent folder',
+      default_icon: {
+        16: 'icon-16.png',
+        24: 'icon-24.png',
+        32: 'icon-32.png',
+        48: 'icon-48.png',
+      },
+    },
     commands: {
       _execute_action: {
         suggested_key: { default: 'Alt+Shift+P' },

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Workspace Tools — up one level</title>
+  <rect x="4" y="4" width="120" height="120" rx="28" fill="#35243F"/>
+  <path d="M30 67v23a8 8 0 0 0 8 8h52a8 8 0 0 0 8-8V67" fill="none" stroke="#FFF4E2" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M64 78V32m-17 17 17-17 17 17" fill="none" stroke="#FFB09E" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

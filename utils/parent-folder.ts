@@ -33,6 +33,9 @@ export function openMoveDialog(): void {
   if (!button || button.matches(':disabled, [aria-disabled="true"]') || !isVisible(button)) {
     throw new Error('Move control unavailable. Wait for the editor to load; an English Google UI is required.');
   }
+  // Google's Closure toolbar controls activate on mouse down/up, not click alone.
+  button.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true, button: 0, buttons: 1, view: window }));
+  button.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true, button: 0, buttons: 0, view: window }));
   button.click();
 }
 

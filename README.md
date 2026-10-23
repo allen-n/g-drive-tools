@@ -61,3 +61,7 @@ English Google interface required. Google can change its DOM, and read-only file
 - `tests/`: UI fixtures and behavior checks.
 
 Add future tools as small feature modules and WXT entrypoints as needed. Expand permissions only for functionality that exists.
+
+## Icon
+
+The original plum, cream, and peach tray/arrow mark is independent of Google's branding. Its editable source is `assets/icon.svg`; `public/icon-*.png` contains exports at 16, 24, 32, 48, 64, 96, and 128 pixels. WXT discovers these files for the manifest; toolbar sizes are also declared explicitly. No icon-generation dependency is required.

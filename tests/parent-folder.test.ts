@@ -74,3 +74,18 @@ it('ignores dialogs hidden by an ancestor', () => {
   expect(() => openMoveDialog()).not.toThrow();
   expect(click).toHaveBeenCalledOnce();
 });
+
+it('opens a mouse-driven toolbar control before reading the parent folder', () => {
+  document.body.innerHTML = '<div id="docs-titlebar-folder-button" role="button" tabindex="0">Move</div>';
+  const button = document.querySelector<HTMLElement>('[role="button"]')!;
+  let pressed = false;
+  // Closure controls activate on mouse down and perform their action on mouse up.
+  button.addEventListener('mousedown', (event) => { pressed = event.button === 0; });
+  button.addEventListener('mouseup', () => {
+    if (!pressed) return;
+    document.body.insertAdjacentHTML('beforeend', '<div role="dialog"><a aria-label="Open folder in new tab" href="https://drive.google.com/drive/folders/parent"></a><button>Move</button></div>');
+    pressed = false;
+  });
+  openMoveDialog();
+  expect(readParentFolder()).toBe('https://drive.google.com/drive/folders/parent');
+});
