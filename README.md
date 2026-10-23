@@ -6,22 +6,22 @@ The first tool opens the current Google Docs, Sheets, or Slides file's parent fo
 
 ## Develop and install
 
-Use Node 22.12+ (the existing `.nvmrc` selects Node 22) and npm.
+Use Node 22.12+ (the existing `.nvmrc` selects Node 22) and pnpm 10.12.3.
 
 ```sh
 nvm use
-npm ci
-npm run dev
+pnpm install --frozen-lockfile
+pnpm dev
 ```
 
 WXT launches a development Chrome profile. For your normal signed-in Chrome profile:
 
-1. Run `npm run build`.
+1. Run `pnpm build`.
 2. Open `chrome://extensions`, enable **Developer mode**, and choose **Load unpacked**.
 3. Select `.output/chrome-mv3` in this repo.
 4. Pin **Workspace Tools** in Chrome's extensions menu.
 
-Reload the extension after rebuilding. `npm run zip` creates a distributable ZIP under `.output/`.
+Reload the extension after rebuilding. `pnpm zip` creates a distributable ZIP under `.output/`.
 
 ## Open parent folder
 
@@ -42,9 +42,9 @@ No persistent Docs/Gmail permission, cookies permission, background scraping, st
 ## Checks
 
 ```sh
-npm test
-npm run typecheck
-npm run build
+pnpm test
+pnpm typecheck
+pnpm build
 ```
 
 Tests cover sanitized markup from both supplied HAR recordings (a Google Doc and an Excel file in Sheets), URL validation, delayed picker rendering, timeout handling, and duplicate clicks. HARs are private debugging inputs and are ignored by Git.
