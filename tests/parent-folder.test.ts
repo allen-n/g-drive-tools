@@ -44,16 +44,16 @@ describe('picker UI', () => {
     const confirm = vi.spyOn(document.querySelector<HTMLButtonElement>('[role="dialog"] button')!, 'click');
     const click = vi.spyOn(titleButton, 'click');
     // Existing dialogs must be left alone rather than toggled or confirmed.
-    expect(() => openMoveDialog()).toThrow(/dialog/i);
+    expect(openMoveDialog()).toEqual({ ok: false, error: 'Close the existing dialog and try again.' });
     document.querySelector('[role="dialog"]')!.remove();
-    openMoveDialog();
+    expect(openMoveDialog()).toEqual({ ok: true });
     expect(click).toHaveBeenCalledOnce();
     expect(confirm).not.toHaveBeenCalled();
   });
   it('reports missing or disabled controls', () => {
-    expect(() => openMoveDialog()).toThrow(/Move/);
+    expect(openMoveDialog()).toMatchObject({ ok: false, error: expect.stringContaining('Move control unavailable') });
     document.body.innerHTML = '<button id="docs-titlebar-folder-button" disabled>Move</button>';
-    expect(() => openMoveDialog()).toThrow(/Move/);
+    expect(openMoveDialog()).toMatchObject({ ok: false, error: expect.stringContaining('Move control unavailable') });
   });
 });
 
@@ -71,7 +71,7 @@ it('closes only the current-location dialog using Cancel', async () => {
 it('ignores dialogs hidden by an ancestor', () => {
   document.body.innerHTML = '<div style="display:none"><div role="dialog">Old dialog</div></div><button id="docs-titlebar-folder-button">Move</button>';
   const click = vi.spyOn(document.querySelector<HTMLButtonElement>('button')!, 'click');
-  expect(() => openMoveDialog()).not.toThrow();
+  expect(openMoveDialog()).toEqual({ ok: true });
   expect(click).toHaveBeenCalledOnce();
 });
 

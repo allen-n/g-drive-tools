@@ -16,7 +16,7 @@ export function isFolderUrl(value: string): boolean {
 }
 
 // Injected functions must not capture module variables.
-export function openMoveDialog(): void {
+export function openMoveDialog(): { ok: true } | { ok: false; error: string } {
   function isVisible(element: HTMLElement): boolean {
     for (let current: HTMLElement | null = element; current; current = current.parentElement) {
       const style = getComputedStyle(current);
@@ -26,17 +26,18 @@ export function openMoveDialog(): void {
   }
   const visibleDialog = [...document.querySelectorAll<HTMLElement>('[role="dialog"]')]
     .some(isVisible);
-  if (visibleDialog) throw new Error('Close the existing dialog and try again.');
+  if (visibleDialog) return { ok: false, error: 'Close the existing dialog and try again.' };
   const button = document.querySelector<HTMLElement>(
     '#docs-titlebar-folder-button, [role="button"][aria-label="Move"], [role="button"][aria-label="Move to folder"]',
   );
   if (!button || button.matches(':disabled, [aria-disabled="true"]') || !isVisible(button)) {
-    throw new Error('Move control unavailable. Wait for the editor to load; an English Google UI is required.');
+    return { ok: false, error: 'Move control unavailable. Wait for the editor to load; an English Google UI is required.' };
   }
   // Google's Closure toolbar controls activate on mouse down/up, not click alone.
   button.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true, button: 0, buttons: 1, view: window }));
   button.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true, button: 0, buttons: 0, view: window }));
   button.click();
+  return { ok: true };
 }
 
 export function readParentFolder(): string | null {

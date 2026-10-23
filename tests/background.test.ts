@@ -13,8 +13,8 @@ const api = vi.hoisted(() => ({
 vi.mock('wxt/browser', () => ({ browser: api }));
 import background from '../entrypoints/background';
 
-let click: (tab: { id: number; url: string }) => Promise<void>;
-const tab = { id: 1, url: 'https://docs.google.com/document/d/example/edit' };
+let click: (tab: { id: number; windowId: number; url: string }) => Promise<void>;
+const tab = { id: 1, windowId: 7, url: 'https://docs.google.com/document/d/example/edit' };
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -24,10 +24,10 @@ beforeEach(() => {
 });
 afterEach(() => vi.useRealTimers());
 
-it('opens a delayed folder from the picker frame, ignoring unsafe destinations', async () => {
+it('opens a delayed folder in the source window, ignoring unsafe destinations', async () => {
   vi.useFakeTimers();
   api.scripting.executeScript
-    .mockResolvedValueOnce([])
+    .mockResolvedValueOnce([{ frameId: 0, result: { ok: true } }])
     .mockResolvedValueOnce([{ frameId: 0, result: null }])
     .mockResolvedValueOnce([
       { frameId: 0, result: 'https://evil.example/drive/folders/wrong' },
@@ -38,7 +38,7 @@ it('opens a delayed folder from the picker frame, ignoring unsafe destinations',
   await vi.runAllTimersAsync();
   await pending;
   expect(api.tabs.create).toHaveBeenCalledExactlyOnceWith({
-    url: 'https://drive.google.com/drive/u/1/folders/parent', openerTabId: 1,
+    url: 'https://drive.google.com/drive/u/1/folders/parent', openerTabId: 1, windowId: 7,
   });
   expect(api.action.setBadgeText).toHaveBeenLastCalledWith({ tabId: 1, text: '' });
 });
@@ -52,7 +52,7 @@ it('does not run on an unrelated page', async () => {
 
 it('times out safely without opening a tab and allows another attempt', async () => {
   vi.useFakeTimers();
-  api.scripting.executeScript.mockResolvedValue([]);
+  api.scripting.executeScript.mockResolvedValueOnce([{ frameId: 0, result: { ok: true } }]).mockResolvedValue([]);
   const pending = click(tab);
   await click(tab);
   await vi.runAllTimersAsync();
@@ -62,4 +62,17 @@ it('times out safely without opening a tab and allows another attempt', async ()
   api.scripting.executeScript.mockRejectedValueOnce(new Error('Move unavailable'));
   await click(tab);
   expect(api.action.setTitle).toHaveBeenLastCalledWith({ tabId: 1, title: 'Move unavailable' });
+});
+
+it.each([
+  { result: { ok: false, error: 'Close the existing dialog and try again.' }, message: 'Close the existing dialog and try again.' },
+  { result: undefined, message: 'Could not open the Move dialog.' },
+])('stops before polling or cancelling when the opener fails: $message', async ({ result, message }) => {
+  api.scripting.executeScript
+    .mockResolvedValueOnce([{ frameId: 0, result }])
+    .mockResolvedValue([{ frameId: 4, result: 'https://drive.google.com/drive/folders/existing' }]);
+  await click(tab);
+  expect(api.scripting.executeScript).toHaveBeenCalledOnce();
+  expect(api.tabs.create).not.toHaveBeenCalled();
+  expect(api.action.setTitle).toHaveBeenLastCalledWith({ tabId: 1, title: message });
 });

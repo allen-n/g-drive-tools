@@ -12,7 +12,10 @@ export default defineBackground(() => {
     try {
       await browser.action.setBadgeText({ tabId, text: '…' });
       if (!isEditorUrl(tab.url)) throw new Error('Open a Google Docs, Sheets, or Slides file first.');
-      await browser.scripting.executeScript({ target: { tabId }, func: openMoveDialog });
+      const [opener] = await browser.scripting.executeScript({ target: { tabId }, func: openMoveDialog });
+      if (opener?.result?.ok !== true) {
+        throw new Error(opener?.result?.error ?? 'Could not open the Move dialog.');
+      }
       const deadline = Date.now() + 15_000;
       while (Date.now() < deadline) {
         const results = await browser.scripting.executeScript({
@@ -21,7 +24,7 @@ export default defineBackground(() => {
         });
         const folder = results.find(({ result }) => typeof result === 'string' && isFolderUrl(result));
         if (folder && typeof folder.result === 'string') {
-          await browser.tabs.create({ url: folder.result, openerTabId: tabId });
+          await browser.tabs.create({ url: folder.result, openerTabId: tabId, windowId: tab.windowId });
           // Closing is best effort: the parent tab has already opened successfully.
           await browser.scripting.executeScript({
             target: { tabId, frameIds: [folder.frameId] }, func: closeMoveDialog,
